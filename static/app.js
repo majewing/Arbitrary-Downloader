@@ -303,9 +303,11 @@ function resetApp() {
 
 function openFolder() {
     var dir = document.getElementById('download-dir').value.trim();
-    if (dir) {
-        window.open('file://' + dir);
-    }
+    fetch('/api/open-folder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ path: dir })
+    });
 }
 
 /* === History === */
@@ -381,14 +383,44 @@ function redownload(url) {
     document.getElementById('url-input').focus();
 }
 
+/* === Modal === */
+
+function showConfirm(title, desc) {
+    return new Promise(function(resolve) {
+        var overlay = document.getElementById('modal-overlay');
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-desc').textContent = desc;
+        overlay.classList.add('open');
+
+        var confirmBtn = document.getElementById('modal-confirm');
+        var cancelBtn = document.getElementById('modal-cancel');
+
+        function close(result) {
+            overlay.classList.remove('open');
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
+            overlay.removeEventListener('click', onOverlay);
+            resolve(result);
+        }
+
+        function onConfirm() { close(true); }
+        function onCancel() { close(false); }
+        function onOverlay(e) { if (e.target === overlay) close(false); }
+
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+        overlay.addEventListener('click', onOverlay);
+    });
+}
+
 async function deleteHistoryItem(id) {
-    if (!confirm('确定删除这条记录？')) return;
+    if (!await showConfirm('删除记录', '确定删除这条下载记录？此操作不可撤销。')) return;
     await fetch('/api/history/' + id, { method: 'DELETE' });
     loadHistory(currentPage);
 }
 
 async function clearAllHistory() {
-    if (!confirm('确定清空所有下载记录？')) return;
+    if (!await showConfirm('清空历史', '确定清空所有下载记录？此操作不可撤销。')) return;
     await fetch('/api/history', { method: 'DELETE' });
     loadHistory(1);
 }

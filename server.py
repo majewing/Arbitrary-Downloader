@@ -1,6 +1,8 @@
 import asyncio
 import json
 import os
+import platform
+import subprocess
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -272,6 +274,27 @@ async def delete_history(history_id: int):
 async def clear_history():
     count = db.clear_history()
     return {"ok": True, "deleted": count}
+
+
+@app.post("/api/open-folder")
+async def open_folder(body: dict):
+    path = body.get("path", "").strip()
+    if not path:
+        path = config.download_directory
+    path = os.path.abspath(os.path.expanduser(path))
+    if not os.path.isdir(path):
+        return JSONResponse({"error": "目录不存在"}, status_code=400)
+    try:
+        system = platform.system()
+        if system == "Darwin":
+            subprocess.Popen(["open", path])
+        elif system == "Windows":
+            os.startfile(path)
+        else:
+            subprocess.Popen(["xdg-open", path])
+        return {"ok": True}
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
 def _fmt_size(n):

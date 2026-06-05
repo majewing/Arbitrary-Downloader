@@ -834,3 +834,68 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* === Modal === */
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 150ms var(--ease);
+}
+
+.modal-overlay.open {
+    display: flex;
+}
+
+.modal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    padding: 24px;
+    width: 360px;
+    max-width: calc(100vw - 32px);
+    animation: modalIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.modal-desc {
+    font-size: 13px;
+    color: var(--text-3);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.modal-actions .btn-danger {
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    background: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+.modal-actions .btn-danger:hover {
+    background: #dc2626;
+    border-color: #dc2626;
+}
