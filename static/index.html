@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilibili 视频下载器</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Bilibili 视频下载器</h1>
+        <p class="subtitle">基于 yt-dlp</p>
+
+        <div id="section-input" class="section active">
+            <div class="card">
+                <div class="form-group">
+                    <label for="url-input">视频链接</label>
+                    <input type="text" id="url-input" placeholder="输入 Bilibili 视频链接...">
+                </div>
+                <div class="form-group">
+                    <label for="browser-select">浏览器 Cookie</label>
+                    <select id="browser-select">
+                        <option value="">不使用 Cookie</option>
+                        <option value="chrome" selected>Chrome</option>
+                        <option value="firefox">Firefox</option>
+                        <option value="edge">Edge</option>
+                        <option value="brave">Brave</option>
+                        <option value="safari">Safari</option>
+                    </select>
+                </div>
+                <button id="fetch-btn" class="btn btn-primary" onclick="fetchInfo()">获取视频信息</button>
+                <div id="fetch-error" class="error-msg"></div>
+                <p class="tip">需要先在浏览器中登录 Bilibili，选择你已登录的浏览器</p>
+            </div>
+        </div>
+
+        <div id="section-format" class="section">
+            <div class="card">
+                <div id="video-header" class="video-header">
+                    <h2 id="video-title"></h2>
+                    <p id="video-meta" class="meta"></p>
+                </div>
+
+                <div class="format-section">
+                    <h3>视频流 <span class="hint">（选择一个）</span></h3>
+                    <div class="table-wrapper">
+                        <table id="video-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>ID</th>
+                                    <th>分辨率</th>
+                                    <th>格式</th>
+                                    <th>编码</th>
+                                    <th>FPS</th>
+                                    <th>大小</th>
+                                    <th>备注</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="format-section">
+                    <h3>音频流 <span class="hint">（选择一个）</span></h3>
+                    <div class="table-wrapper">
+                        <table id="audio-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>ID</th>
+                                    <th>格式</th>
+                                    <th>编码</th>
+                                    <th>码率</th>
+                                    <th>大小</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="download-settings">
+                    <div class="form-group">
+                        <label for="download-dir">下载目录</label>
+                        <div class="dir-row">
+                            <input type="text" id="download-dir" placeholder="下载目录...">
+                            <button class="btn btn-sm" onclick="updateDir()">保存</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="format-error" class="error-msg"></div>
+
+                <div class="btn-row">
+                    <button class="btn" onclick="goBack()">返回</button>
+                    <button class="btn btn-primary" onclick="startDownload()">下载</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="section-download" class="section">
+            <div class="card">
+                <h2 id="dl-title" class="dl-title">准备下载...</h2>
+
+                <div class="progress-wrapper">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <span class="progress-text" id="progress-text">0%</span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-item">
+                        <span class="info-label">大小</span>
+                        <span class="info-value" id="info-size">N/A</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">速度</span>
+                        <span class="info-value" id="info-speed">N/A</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">已下载</span>
+                        <span class="info-value" id="info-downloaded">N/A</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">剩余时间</span>
+                        <span class="info-value" id="info-eta">N/A</span>
+                    </div>
+                </div>
+
+                <div id="dl-message" class="dl-message"></div>
+
+                <div id="dl-actions" class="btn-row" style="display:none;">
+                    <button class="btn" onclick="openFolder()">打开文件夹</button>
+                    <button class="btn btn-primary" onclick="resetApp()">下载另一个</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
