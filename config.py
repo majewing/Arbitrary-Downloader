@@ -1,31 +1,36 @@
-import json
 import os
 
-CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+from database import DB_DIR
+
 DEFAULT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Downloads")
 
 
 class Config:
-    def __init__(self):
-        self.download_directory = DEFAULT_DIR
-        self.load()
+    def __init__(self, db=None):
+        from database import Database
 
-    def load(self):
-        if os.path.exists(CONFIG_FILE):
+        self._db = db or Database()
+        self._migrate_json()
+
+    def _migrate_json(self):
+        json_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
+        if os.path.exists(json_path) and self._db.get_config("migrated_from_json") is None:
             try:
-                with open(CONFIG_FILE) as f:
+                import json
+
+                with open(json_path) as f:
                     data = json.load(f)
-                self.download_directory = data.get("download_directory", DEFAULT_DIR)
-            except (json.JSONDecodeError, OSError):
+                if "download_directory" in data:
+                    self._db.set_config("download_directory", data["download_directory"])
+                self._db.set_config("migrated_from_json", "1")
+            except Exception:
                 pass
 
-    def save(self):
-        os.makedirs(os.path.dirname(CONFIG_FILE), exist_ok=True)
-        with open(CONFIG_FILE, "w") as f:
-            json.dump({"download_directory": self.download_directory}, f, indent=2)
+    @property
+    def download_directory(self):
+        return self._db.get_config("download_directory", DEFAULT_DIR)
 
     def set_download_directory(self, path):
         path = os.path.abspath(os.path.expanduser(path))
         os.makedirs(path, exist_ok=True)
-        self.download_directory = path
-        self.save()
+        self._db.set_config("download_directory", path)

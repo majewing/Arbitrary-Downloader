@@ -2,22 +2,25 @@ import asyncio
 import json
 import os
 import uuid
+from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from config import Config
+from database import Database
 from downloader import Downloader
 
-app = FastAPI(title="Bilibili Video Downloader")
+app = FastAPI(title="通用视频下载器")
 
 STATIC_DIR = Path(__file__).parent / "static"
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
-config = Config()
+db = Database()
+config = Config(db=db)
 downloader = Downloader()
 
 download_tasks: dict[str, dict] = {}
@@ -134,13 +137,32 @@ async def start_download(body: dict):
         os.makedirs(download_dir, exist_ok=True)
     else:
         download_dir = config.download_directory
+
+    info_title = body.get("title", "")
+    info_uploader = body.get("uploader", "")
+    info_thumbnail = body.get("thumbnail", "")
+    info_duration = body.get("duration", "")
+
+    history_id = db.add_history(
+        {
+            "url": url,
+            "title": info_title,
+            "uploader": info_uploader,
+            "thumbnail": info_thumbnail,
+            "duration": info_duration,
+            "video_format": video_format,
+            "audio_format": audio_format or "",
+            "status": "downloading",
+        }
+    )
+
     task_id = str(uuid.uuid4())[:8]
     download_tasks[task_id] = {
         "url": url,
         "format_spec": format_spec,
         "download_dir": download_dir,
         "browser": browser,
-        "status": "pending",
+        "history_id": history_id,
     }
     return {"task_id": task_id}
 
@@ -157,6 +179,7 @@ async def ws_download(websocket: WebSocket, task_id: str):
     format_spec = task["format_spec"]
     download_dir = task["download_dir"]
     browser = task["browser"]
+    history_id = task["history_id"]
 
     progress_queue: asyncio.Queue = asyncio.Queue()
 
@@ -209,13 +232,19 @@ async def ws_download(websocket: WebSocket, task_id: str):
             remaining.append(progress_queue.get_nowait())
         for data in remaining:
             await websocket.send_json(data)
+        now = datetime.now().isoformat()
         if download_error:
+            db.update_history(history_id, status="failed", error_msg=str(download_error), completed_at=now)
             await websocket.send_json({"status": "error", "message": str(download_error)})
         else:
+            db.update_history(history_id, status="success", completed_at=now)
             await websocket.send_json({"status": "complete", "message": "下载完成！"})
     except WebSocketDisconnect:
-        pass
+        now = datetime.now().isoformat()
+        db.update_history(history_id, status="failed", error_msg="客户端断开连接", completed_at=now)
     except Exception as e:
+        now = datetime.now().isoformat()
+        db.update_history(history_id, status="failed", error_msg=str(e), completed_at=now)
         try:
             await websocket.send_json({"status": "error", "message": str(e)})
         except Exception:
@@ -225,6 +254,24 @@ async def ws_download(websocket: WebSocket, task_id: str):
             await websocket.close()
         except Exception:
             pass
+
+
+@app.get("/api/history")
+async def get_history(page: int = Query(1, ge=1), size: int = Query(20, ge=1, le=100)):
+    return db.get_history(page=page, size=size)
+
+
+@app.delete("/api/history/{history_id}")
+async def delete_history(history_id: int):
+    if db.delete_history(history_id):
+        return {"ok": True}
+    return JSONResponse({"error": "记录不存在"}, status_code=404)
+
+
+@app.delete("/api/history")
+async def clear_history():
+    count = db.clear_history()
+    return {"ok": True, "deleted": count}
 
 
 def _fmt_size(n):

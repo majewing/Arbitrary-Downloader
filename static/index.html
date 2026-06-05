@@ -3,143 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilibili 视频下载器</title>
+    <title>通用视频下载器</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="title">Bilibili 视频下载器</h1>
-        <p class="subtitle">基于 yt-dlp</p>
 
-        <div id="section-input" class="section active">
+<!-- Header -->
+<header class="header">
+    <div class="header-left">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="logo-text">通用视频下载器</span>
+    </div>
+    <nav class="header-nav">
+        <button class="nav-link active" data-page="download" onclick="switchPage('download')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>下载</span>
+        </button>
+        <button class="nav-link" data-page="history" onclick="switchPage('history')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>历史记录</span>
+        </button>
+    </nav>
+</header>
+
+<main class="main">
+
+    <!-- ====== Download Page ====== -->
+    <div id="page-download" class="page active">
+
+        <!-- Input Section -->
+        <section id="section-input" class="section active">
             <div class="card">
-                <div class="form-group">
-                    <label for="url-input">视频链接</label>
-                    <input type="text" id="url-input" placeholder="输入 Bilibili 视频链接...">
+                <div class="input-wrapper">
+                    <div class="input-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    </div>
+                    <input type="text" id="url-input" placeholder="粘贴视频链接...">
                 </div>
-                <div class="form-group">
-                    <label for="browser-select">浏览器 Cookie</label>
-                    <select id="browser-select">
-                        <option value="">不使用 Cookie</option>
-                        <option value="chrome" selected>Chrome</option>
-                        <option value="firefox">Firefox</option>
-                        <option value="edge">Edge</option>
-                        <option value="brave">Brave</option>
-                        <option value="safari">Safari</option>
-                    </select>
+
+                <div class="separator"></div>
+
+                <div class="pill-group">
+                    <span class="pill-label">Cookie</span>
+                    <button class="pill active" data-browser="" onclick="selectPill(this)">无</button>
+                    <button class="pill" data-browser="chrome" onclick="selectPill(this)">Chrome</button>
+                    <button class="pill" data-browser="firefox" onclick="selectPill(this)">Firefox</button>
+                    <button class="pill" data-browser="edge" onclick="selectPill(this)">Edge</button>
+                    <button class="pill" data-browser="brave" onclick="selectPill(this)">Brave</button>
+                    <button class="pill" data-browser="safari" onclick="selectPill(this)">Safari</button>
                 </div>
-                <button id="fetch-btn" class="btn btn-primary" onclick="fetchInfo()">获取视频信息</button>
+
+                <button id="fetch-btn" class="btn-primary mt-20" onclick="fetchInfo()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    解析视频
+                </button>
+
                 <div id="fetch-error" class="error-msg"></div>
-                <p class="tip">需要先在浏览器中登录 Bilibili，选择你已登录的浏览器</p>
+                <p class="tip">部分视频网站需要登录，请选择已登录的浏览器以提取 Cookie</p>
             </div>
-        </div>
+        </section>
 
-        <div id="section-format" class="section">
+        <!-- Format Section -->
+        <section id="section-format" class="section">
             <div class="card">
-                <div id="video-header" class="video-header">
-                    <h2 id="video-title"></h2>
-                    <p id="video-meta" class="meta"></p>
+                <div class="video-header">
+                    <div id="video-title" class="video-title"></div>
+                    <div id="video-meta" class="video-meta"></div>
                 </div>
 
-                <div class="format-section">
-                    <h3>视频流 <span class="hint">（选择一个）</span></h3>
-                    <div class="table-wrapper">
-                        <table id="video-table">
+                <div class="fmt-section">
+                    <div class="fmt-section-title">视频流 <span class="hint">— 选择一个</span></div>
+                    <div class="table-scroll">
+                        <table id="video-table" class="fmt-table">
                             <thead>
                                 <tr>
-                                    <th></th>
-                                    <th>ID</th>
-                                    <th>分辨率</th>
-                                    <th>格式</th>
-                                    <th>编码</th>
-                                    <th>FPS</th>
-                                    <th>大小</th>
-                                    <th>备注</th>
+                                    <th>ID</th><th>分辨率</th><th>格式</th><th>编码</th><th>FPS</th><th>大小</th><th>备注</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="no-video" class="no-data" style="display:none;">无可用视频流</div>
                 </div>
 
-                <div class="format-section">
-                    <h3>音频流 <span class="hint">（选择一个）</span></h3>
-                    <div class="table-wrapper">
-                        <table id="audio-table">
+                <div class="fmt-section">
+                    <div class="fmt-section-title">音频流 <span class="hint">— 选择一个</span></div>
+                    <div class="table-scroll">
+                        <table id="audio-table" class="fmt-table">
                             <thead>
                                 <tr>
-                                    <th></th>
-                                    <th>ID</th>
-                                    <th>格式</th>
-                                    <th>编码</th>
-                                    <th>码率</th>
-                                    <th>大小</th>
+                                    <th>ID</th><th>格式</th><th>编码</th><th>码率</th><th>大小</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div>
+                    <div id="no-audio" class="no-data" style="display:none;">无可用音频流</div>
                 </div>
 
                 <div class="download-settings">
-                    <div class="form-group">
-                        <label for="download-dir">下载目录</label>
-                        <div class="dir-row">
+                    <label class="settings-label">下载目录</label>
+                    <div class="dir-row">
+                        <div class="input-wrapper">
                             <input type="text" id="download-dir" placeholder="下载目录...">
-                            <button class="btn btn-sm" onclick="updateDir()">保存</button>
                         </div>
+                        <button class="btn btn-sm" onclick="updateDir()">保存</button>
                     </div>
                 </div>
 
                 <div id="format-error" class="error-msg"></div>
 
                 <div class="btn-row">
-                    <button class="btn" onclick="goBack()">返回</button>
-                    <button class="btn btn-primary" onclick="startDownload()">下载</button>
+                    <button class="btn" onclick="goBack()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        返回
+                    </button>
+                    <button class="btn-primary" onclick="startDownload()" style="width:auto;min-width:120px;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        开始下载
+                    </button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div id="section-download" class="section">
+        <!-- Download Progress Section -->
+        <section id="section-download" class="section">
             <div class="card">
                 <h2 id="dl-title" class="dl-title">准备下载...</h2>
 
-                <div class="progress-wrapper">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
-                    </div>
-                    <span class="progress-text" id="progress-text">0%</span>
+                <div class="progress-track">
+                    <div class="progress-fill" id="progress-fill"></div>
                 </div>
+                <div class="progress-pct" id="progress-text">0%</div>
 
                 <div class="info-grid">
                     <div class="info-item">
                         <span class="info-label">大小</span>
-                        <span class="info-value" id="info-size">N/A</span>
+                        <span class="info-value" id="info-size">—</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">速度</span>
-                        <span class="info-value" id="info-speed">N/A</span>
+                        <span class="info-value" id="info-speed">—</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">已下载</span>
-                        <span class="info-value" id="info-downloaded">N/A</span>
+                        <span class="info-value" id="info-downloaded">—</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">剩余时间</span>
-                        <span class="info-value" id="info-eta">N/A</span>
+                        <span class="info-value" id="info-eta">—</span>
                     </div>
                 </div>
 
                 <div id="dl-message" class="dl-message"></div>
 
                 <div id="dl-actions" class="btn-row" style="display:none;">
-                    <button class="btn" onclick="openFolder()">打开文件夹</button>
-                    <button class="btn btn-primary" onclick="resetApp()">下载另一个</button>
+                    <button class="btn" onclick="openFolder()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                        打开文件夹
+                    </button>
+                    <button class="btn-primary" onclick="resetApp()" style="width:auto;min-width:120px;">
+                        下载另一个
+                    </button>
                 </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ====== History Page ====== -->
+    <div id="page-history" class="page">
+        <div class="card">
+            <div class="history-header">
+                <h2>下载历史</h2>
+                <button class="btn btn-sm btn-danger" onclick="clearAllHistory()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    清空全部
+                </button>
+            </div>
+
+            <div id="history-list" class="history-list">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <div>暂无下载记录</div>
+                </div>
+            </div>
+
+            <div id="history-pagination" class="pagination" style="display:none;">
+                <button class="btn btn-sm" id="history-prev" onclick="loadHistory(currentPage-1)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="15 18 9 12 15 6"/></svg>
+                    上一页
+                </button>
+                <span id="history-page-info" class="pagination-info"></span>
+                <button class="btn btn-sm" id="history-next" onclick="loadHistory(currentPage+1)">
+                    下一页
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="/static/app.js"></script>
+</main>
+
+<script src="/static/app.js"></script>
 </body>
 </html>
