@@ -11,6 +11,8 @@ wheels/
 
 # custom
 .DS_Store
+docs
 Downloads
 .agents/
+.superpowers/
 .playwright-mcp/

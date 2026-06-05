@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="ocean">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
+    <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'ocean'}catch(e){}</script>
 </head>
 <body>
 
@@ -28,6 +29,52 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             <span>历史记录</span>
         </button>
+        <div class="theme-toggle">
+            <button class="btn-icon" onclick="toggleThemePanel()" title="主题设置">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </button>
+            <div id="theme-panel" class="theme-panel">
+                <div class="theme-panel-title">主题色</div>
+                <div class="theme-grid">
+                    <button class="theme-swatch active" data-theme="ocean" onclick="setTheme('ocean')">
+                        <div class="theme-dot" style="background:#3b82f6">
+                            <div class="theme-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        </div>
+                        <span class="theme-name">Ocean</span>
+                    </button>
+                    <button class="theme-swatch" data-theme="emerald" onclick="setTheme('emerald')">
+                        <div class="theme-dot" style="background:#10b981">
+                            <div class="theme-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        </div>
+                        <span class="theme-name">Emerald</span>
+                    </button>
+                    <button class="theme-swatch" data-theme="violet" onclick="setTheme('violet')">
+                        <div class="theme-dot" style="background:#8b5cf6">
+                            <div class="theme-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        </div>
+                        <span class="theme-name">Violet</span>
+                    </button>
+                    <button class="theme-swatch" data-theme="rose" onclick="setTheme('rose')">
+                        <div class="theme-dot" style="background:#f43f5e">
+                            <div class="theme-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        </div>
+                        <span class="theme-name">Rose</span>
+                    </button>
+                    <button class="theme-swatch" data-theme="amber" onclick="setTheme('amber')">
+                        <div class="theme-dot" style="background:#f59e0b">
+                            <div class="theme-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        </div>
+                        <span class="theme-name">Amber</span>
+                    </button>
+                    <button class="theme-swatch" data-theme="cyan" onclick="setTheme('cyan')">
+                        <div class="theme-dot" style="background:#06b6d4">
+                            <div class="theme-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        </div>
+                        <span class="theme-name">Cyan</span>
+                    </button>
+                </div>
+            </div>
+        </div>
     </nav>
 </header>
 

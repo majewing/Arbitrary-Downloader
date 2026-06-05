@@ -34,3 +34,10 @@ class Config:
         path = os.path.abspath(os.path.expanduser(path))
         os.makedirs(path, exist_ok=True)
         self._db.set_config("download_directory", path)
+
+    @property
+    def theme(self):
+        return self._db.get_config("theme", "ocean")
+
+    def set_theme(self, value):
+        self._db.set_config("theme", value)

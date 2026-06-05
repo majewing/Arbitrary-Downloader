@@ -48,7 +48,9 @@ async def update_config(body: dict):
     try:
         os.makedirs(path, exist_ok=True)
         config.set_download_directory(path)
-        return {"download_directory": config.download_directory}
+        if "theme" in body:
+            config.set_theme(body["theme"])
+        return {"download_directory": config.download_directory, "theme": config.theme}
     except OSError as e:
         return JSONResponse({"error": f"无效路径: {e}"}, status_code=400)
 

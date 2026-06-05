@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter') fetchInfo();
     });
     document.getElementById('url-input').focus();
+    initTheme();
 });
 
 /* === Fetch Video Info === */
@@ -451,3 +452,50 @@ function escAttr(text) {
     if (!text) return '';
     return text.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
 }
+
+/* === Theme === */
+
+var currentTheme = 'ocean';
+
+function setTheme(id) {
+    currentTheme = id;
+    document.documentElement.dataset.theme = id;
+    localStorage.setItem('theme', id);
+
+    document.querySelectorAll('.theme-swatch').forEach(function(s) {
+        s.classList.toggle('active', s.dataset.theme === id);
+    });
+
+    fetch('/api/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: id })
+    }).catch(function() {});
+}
+
+function toggleThemePanel() {
+    var panel = document.getElementById('theme-panel');
+    panel.classList.toggle('open');
+}
+
+async function initTheme() {
+    var stored = localStorage.getItem('theme');
+    if (!stored) {
+        try {
+            var resp = await fetch('/api/config');
+            var data = await resp.json();
+            stored = data.theme || 'ocean';
+        } catch (e) {
+            stored = 'ocean';
+        }
+    }
+    setTheme(stored);
+}
+
+document.addEventListener('click', function(e) {
+    var toggle = document.querySelector('.theme-toggle');
+    var panel = document.getElementById('theme-panel');
+    if (toggle && panel && !toggle.contains(e.target)) {
+        panel.classList.remove('open');
+    }
+});
