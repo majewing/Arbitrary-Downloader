@@ -500,7 +500,7 @@ wheels = [
 ]
 
 [[package]]
-name = "yt-dlp-demo"
+name = "yt-dlp-downloader"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

@@ -1,4 +1,4 @@
-# yt-dlp-demo
+# yt-dlp-downloader
 
 yt-dlp 使用笔记和常见问题解决方案。
 
@@ -138,7 +138,7 @@ chmod +x run.sh && ./run.sh
 ## 项目结构
 
 ```
-yt-dlp-demo/
+yt-dlp-downloader/
 ├── main.py                  # 入口
 ├── app.py                   # Textual App 主框架
 ├── config.py                # 配置管理（下载目录持久化）

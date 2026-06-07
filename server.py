@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 
 from config import Config
 from database import Database
-from downloader import Downloader
+from downloader import Downloader, is_douyin_url
 
 app = FastAPI(title="通用视频下载器")
 
@@ -108,7 +108,7 @@ async def extract_info(body: dict):
         video_formats.sort(key=lambda x: int(x["resolution"].rstrip("p") or 0), reverse=True)
         audio_formats.sort(key=lambda x: float(x["abr"].rstrip("K") or 0), reverse=True)
         duration = info.get("duration", 0)
-        return {
+        result = {
             "title": info.get("title", "未知标题"),
             "uploader": info.get("uploader", "未知上传者"),
             "duration": _fmt_duration(duration),
@@ -117,6 +117,9 @@ async def extract_info(body: dict):
             "video_formats": video_formats,
             "audio_formats": audio_formats,
         }
+        if is_douyin_url(url):
+            result["is_douyin"] = True
+        return result
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
 

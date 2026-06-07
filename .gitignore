@@ -14,5 +14,6 @@ wheels/
 docs
 Downloads
 .agents/
+.opencode/
 .superpowers/
 .playwright-mcp/

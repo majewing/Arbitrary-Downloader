@@ -116,6 +116,13 @@ function renderFormatPage(data) {
             tr.addEventListener('click', function() { selectRow('video-table', tr, f.id); });
             vtBody.appendChild(tr);
         });
+        if (data.is_douyin && data.video_formats.length === 1 && data.video_formats[0].has_audio) {
+            var firstRow = vtBody.querySelector('tr');
+            if (firstRow) {
+                firstRow.classList.add('selected');
+                selectedVideoFormat = data.video_formats[0].id;
+            }
+        }
     } else {
         document.querySelector('#video-table').style.display = 'none';
         noVideo.style.display = '';

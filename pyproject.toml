@@ -1,7 +1,7 @@
 [project]
-name = "yt-dlp-demo"
+name = "yt-dlp-downloader"
 version = "0.1.0"
-description = "Add your description here"
+description = "基于 yt-dlp 实现的音视频下载器"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.136.3",
