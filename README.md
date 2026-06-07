@@ -1,155 +1,151 @@
-# yt-dlp-downloader
+# 通用视频下载器
 
-yt-dlp 使用笔记和常见问题解决方案。
+基于 yt-dlp 的音视频下载器，提供 Web UI 和桌面 GUI 两种使用方式，支持 YouTube、Bilibili、抖音等平台。
 
-## 常用参数
+## 功能
 
-```bash
-# 基本用法（查看可用格式）
-yt-dlp -F <URL>
+- 粘贴链接自动解析视频信息（标题、时长、可用格式）
+- 分别选择视频流和音频流，支持手动合并
+- 实时显示下载进度、速度、剩余时间
+- 支持 Bilibili Cookie 提取（解决 412 问题）
+- 支持抖音视频直接下载
+- 下载历史记录管理
+- 多主题切换
 
-# 下载最佳画质 + 最佳音质并合并
-yt-dlp -f "bestvideo+bestaudio" <URL>
+## 快速开始
 
-# 下载指定格式（视频 + 音频分别指定 ID）
-yt-dlp -f "30112+30280" <URL>
+### 环境要求
 
-# 列出所有字幕
-yt-dlp --list-subs <URL>
+- Python >= 3.12
+- [uv](https://docs.astral.sh/uv/) 包管理器
 
-# 下载带字幕的视频
-yt-dlp --write-subs --sub-langs all <URL>
-
-# 下载播放列表（限制数量）
-yt-dlp --playlist-end 5 <URL>
-
-# 下载播放列表（指定范围）
-yt-dlp --playlist-start 1 --playlist-end 3 <URL>
-
-# 指定输出文件名模板
-yt-dlp -o "%(title)s.%(ext)s" <URL>
-# 按分类存放
-yt-dlp -o "%(playlist_title)s/%(playlist_index)s-%(title)s.%(ext)s" <URL>
-
-# 仅下载音频（提取为 mp3）
-yt-dlp -x --audio-format mp3 <URL>
-
-# 下载缩略图
-yt-dlp --write-thumbnail <URL>
-
-# 下载元数据（描述、评论等）
-yt-dlp --write-info-json --write-description <URL>
-
-# 限制下载速度
-yt-dlp -r 5M <URL>
-```
-
-## Bilibili 常见问题
-
-### HTTP 412 Precondition Failed
-
-Bilibili 有反爬机制，直接下载会报 `HTTP 412`。解决方案：
+### 安装
 
 ```bash
-# 从浏览器提取 Cookie 下载（推荐）
-yt-dlp --cookies-from-browser chrome "https://www.bilibili.com/video/BV1Y2V66gEdn"
-
-# 支持的浏览器：chrome, firefox, edge, brave, safari 等
-
-# 或手动导出 Cookie 文件
-yt-dlp --cookies cookies.txt "https://www.bilibili.com/video/BV1Y2V66gEdn"
+git clone https://github.com/majewing/Arbitrary-Downloader.git
+cd Arbitrary-Downloader
+uv sync
 ```
 
-### 其他 Bilibili 辅助参数
+### 运行
+
+**Web 模式（浏览器访问）：**
 
 ```bash
-# 从浏览器提取 Cookie
---cookies-from-browser BROWSER
-
-# 指定 Referer（某些视频需要）
---add-header "Referer:https://www.bilibili.com"
-
-# 自定义 User-Agent
---user-agent "Mozilla/5.0 ..."
-
-# 下载弹幕（需要装插件或自行处理）
+uv run python server.py
+# 打开 http://localhost:8080
 ```
 
-## 合并与格式
+**桌面模式（原生窗口）：**
 
 ```bash
-# 默认行为：自动选择最佳视频 + 最佳音频并合并
-# 合并失败时可指定合并器
---merge-output-format mp4    # 合并为 MP4
---merge-output-format mkv    # 合并为 MKV
-
-# 不删除下载的单独音视频流（调试用）
--k
+uv run python main.py
+# 自动弹出桌面窗口
 ```
-
-## 代理设置
-
-```bash
-# HTTP 代理
-yt-dlp --proxy http://127.0.0.1:7890 <URL>
-
-# 使用系统代理
-yt-dlp --proxy "" <URL>
-```
-
-## 更新
-
-```bash
-# 更新 yt-dlp 到最新版（Bilibili 反爬经常变，保持最新很重要）
-yt-dlp -U
-```
-
----
-
-# TUI 交互式视频下载器
-
-基于 Textual 和 yt-dlp 的终端交互式下载器。
-
-## 启动
-
-```bash
-# 安装依赖
-pip install textual yt-dlp
-
-# 运行
-chmod +x run.sh && ./run.sh
-# 或直接指定 Python
-/Users/quming/miniconda3/bin/python main.py
-```
-
-## 使用流程
-
-1. **输入页面** — 粘贴 Bilibili 视频链接，选择已登录的浏览器提取 Cookie
-2. **格式选择** — 从列表中分别选择视频流和音频流
-3. **下载页面** — 实时显示下载进度、速度、剩余时间
-4. **完成** — 可打开文件夹或下载下一个视频
-
-## 下载目录
-
-- 默认下载到项目目录下的 `Downloads/` 文件夹
-- 在格式选择页面点击「📁 更改目录」可修改
-- 修改后会自动保存为新的默认路径
 
 ## 项目结构
 
 ```
-yt-dlp-downloader/
-├── main.py                  # 入口
-├── app.py                   # Textual App 主框架
-├── config.py                # 配置管理（下载目录持久化）
-├── downloader.py            # yt-dlp Python API 封装
-├── screens/
-│   ├── input_screen.py      # URL 输入 + 浏览器选择
-│   ├── format_screen.py     # 视频/音频格式选择和展示
-│   ├── change_path_screen.py# 修改下载目录弹窗
-│   └── download_screen.py   # 下载进度和结果展示
-├── config.json              # 持久化配置（自动生成）
-├── main.py                  # 程序启动入口
-├── run.sh                   # 启动脚本
-└── requirements.txt         # Python 依赖
+├── main.py           # PyWebView 桌面入口
+├── server.py         # FastAPI 服务端
+├── downloader.py     # yt-dlp 下载封装
+├── config.py         # 配置管理
+├── database.py       # SQLite 数据库
+├── app.spec          # PyInstaller 打包配置
+├── static/           # 前端资源
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
+├── build/            # 各平台安装包构建脚本
+│   ├── windows/setup.iss
+│   ├── macos/create-dmg.sh
+│   └── linux/AppRun
+└── .github/workflows/build.yml  # CI/CD
 ```
+
+## 打包为桌面应用
+
+项目支持打包为 Windows / macOS / Linux 原生安装包。
+
+### 本地构建
+
+```bash
+# 安装 PyInstaller
+uv add --dev pyinstaller
+
+# 打包
+uv run pyinstaller app.spec --noconfirm
+
+# 产物在 dist/video-downloader/ 目录
+```
+
+### macOS DMG
+
+```bash
+bash build/macos/create-dmg.sh 0.1.0
+# 生成 dist/video-downloader-0.1.0-macos.dmg
+```
+
+### CI 自动构建
+
+推送到 GitHub 后，通过打 tag 触发自动构建：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+GitHub Actions 会自动构建三平台安装包并创建 Release。也可在 Actions 页面手动点击 "Run workflow" 触发。
+
+## GitHub 认证配置
+
+推送代码到 GitHub 需要配置认证，支持以下方式：
+
+### 方式一：SSH（推荐）
+
+1. 生成 SSH 密钥：
+
+```bash
+ssh-keygen -t ed25519 -C "你的邮箱"
+```
+
+2. 将公钥添加到 GitHub：
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+# 复制输出内容 → GitHub → Settings → SSH and GPG keys → New SSH key
+```
+
+3. 切换 remote 为 SSH 地址：
+
+```bash
+git remote set-url origin git@github.com:majewing/Arbitrary-Downloader.git
+```
+
+4. 测试连接并推送：
+
+```bash
+ssh -T git@github.com
+git push
+```
+
+### 方式二：Personal Access Token
+
+1. 前往 [GitHub Token 设置](https://github.com/settings/tokens)
+2. 点击 "Generate new token (classic)"
+3. 勾选 `repo` 权限，生成并复制 token
+4. 推送时使用 token 作为密码：
+
+```bash
+git push
+# Username: majewing
+# Password: ghp_xxxxxxxxxxxx（粘贴 token）
+```
+
+> 密码认证已被 GitHub 废弃，必须使用 token 或 SSH。
+
+## 数据存储
+
+- 下载文件：默认 `~/.video-downloader/Downloads/`，可在设置中修改
+- 数据库：`~/.video-downloader/data.db`
+- 配置：存储在数据库中（首次运行自动从 `config.json` 迁移）
