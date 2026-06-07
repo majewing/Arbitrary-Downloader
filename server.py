@@ -3,6 +3,7 @@ import json
 import os
 import platform
 import subprocess
+import sys
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -17,7 +18,14 @@ from downloader import Downloader, is_douyin_url
 
 app = FastAPI(title="通用视频下载器")
 
-STATIC_DIR = Path(__file__).parent / "static"
+
+def _resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        return Path(sys._MEIPASS) / relative_path
+    return Path(__file__).parent / relative_path
+
+
+STATIC_DIR = _resource_path("static")
 
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 

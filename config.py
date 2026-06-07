@@ -2,7 +2,7 @@ import os
 
 from database import DB_DIR
 
-DEFAULT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Downloads")
+DEFAULT_DIR = os.path.join(os.path.expanduser("~"), ".video-downloader", "Downloads")
 
 
 class Config:
