@@ -62,13 +62,27 @@ jobs:
           cp -r dist/video-downloader/* "${APPDIR}/usr/bin/"
           cp build/linux/AppRun "${APPDIR}/AppRun"
           chmod +x "${APPDIR}/AppRun"
-          cat > "${APPDIR}/video-downloader.desktop" << EOF
+          cat > "${APPDIR}/video-downloader.desktop" << 'EOF'
           [Desktop Entry]
           Name=通用视频下载器
           Exec=video-downloader
+          Icon=video-downloader
           Type=Application
           Categories=Utility;
           EOF
+          convert -size 256x256 xc:'#4A90D9' "${APPDIR}/video-downloader.png" 2>/dev/null || \
+          python3 -c "
+          import struct, zlib
+          def png(w, h, c):
+              d = b'\x00' + bytes(c) * (w * 3)
+              raw = b'\x00'.join([d] * h)
+              return struct.pack('>Q', 0x89504e470d0a1a0a) + b''.join([
+                  struct.pack('>II', 13, 0x49484452) + struct.pack('>IIIB', w, h, 8, 2) + b'\x00\x00\x00',
+                  struct.pack('>I', len(raw)+h, 0x49444154) + zlib.compress(raw) + b'\x00\x00\x00\x00',
+                  struct.pack('>I', 0, 0x49454e44) + b'\xae\x42\x60\x82'
+              ])
+          open('${APPDIR}/video-downloader.png', 'wb').write(png(256, 256, [74, 144, 217]))
+          "
           wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O appimagetool
           chmod +x appimagetool
           ./appimagetool "${APPDIR}" "dist/video-downloader-${VERSION}-linux-x86_64.AppImage"
