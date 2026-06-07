@@ -1,0 +1,100 @@
+name: Build Desktop App
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: windows
+          - os: macos-latest
+            platform: macos
+          - os: ubuntu-latest
+            platform: linux
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Install Linux system dependencies
+        if: matrix.platform == 'linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglib2.0-0 libgdk-pixbuf2.0-0 libwebkit2gtk-4.1-dev
+
+      - name: Build with PyInstaller
+        run: uv run pyinstaller app.spec --noconfirm
+
+      - name: Build Windows installer
+        if: matrix.platform == 'windows'
+        run: |
+          curl -L -o iscc.exe https://files.jrsoftware.org/is/6/ISCC.exe
+          ./iscc.exe build/windows/setup.iss
+          mv installer_output/*.exe dist/video-downloader-windows-x64.exe
+
+      - name: Build macOS DMG
+        if: matrix.platform == 'macos'
+        run: bash build/macos/create-dmg.sh "${{ github.ref_name }}"
+
+      - name: Build Linux AppImage
+        if: matrix.platform == 'linux'
+        run: |
+          VERSION="${GITHUB_REF_NAME:-0.1.0}"
+          APPDIR="dist/appdir"
+          mkdir -p "${APPDIR}/usr/bin"
+          cp -r dist/video-downloader/* "${APPDIR}/usr/bin/"
+          cp build/linux/AppRun "${APPDIR}/AppRun"
+          chmod +x "${APPDIR}/AppRun"
+          cat > "${APPDIR}/video-downloader.desktop" << EOF
+          [Desktop Entry]
+          Name=通用视频下载器
+          Exec=video-downloader
+          Type=Application
+          Categories=Utility;
+          EOF
+          wget -q "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage" -O appimagetool
+          chmod +x appimagetool
+          ./appimagetool "${APPDIR}" "dist/video-downloader-${VERSION}-linux-x86_64.AppImage"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-downloader-${{ matrix.platform }}
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.AppImage
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
