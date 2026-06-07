@@ -37,7 +37,7 @@ jobs:
         if: matrix.platform == 'linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libglib2.0-0 libgdk-pixbuf2.0-0 libwebkit2gtk-4.1-dev
+          sudo apt-get install -y libglib2.0-0 libgdk-pixbuf2.0-0 libwebkit2gtk-4.1-dev libfuse2t64
 
       - name: Build with PyInstaller
         run: uv run pyinstaller app.spec --noconfirm
