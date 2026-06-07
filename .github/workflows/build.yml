@@ -42,12 +42,16 @@ jobs:
       - name: Build with PyInstaller
         run: uv run pyinstaller app.spec --noconfirm
 
+      - name: Install Inno Setup (Windows)
+        if: matrix.platform == 'windows'
+        run: choco install innosetup --no-progress
+
       - name: Build Windows installer
         if: matrix.platform == 'windows'
         run: |
-          curl -L -o iscc.exe https://files.jrsoftware.org/is/6/ISCC.exe
-          ./iscc.exe build/windows/setup.iss
-          mv installer_output/*.exe dist/video-downloader-windows-x64.exe
+          $env:PATH = "C:\Program Files (x86)\Inno Setup 6;$env:PATH"
+          ISCC.exe build\windows\setup.iss
+          Move-Item installer_output\*.exe dist\video-downloader-windows-x64.exe
 
       - name: Build macOS DMG
         if: matrix.platform == 'macos'
