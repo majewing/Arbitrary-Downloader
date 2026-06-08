@@ -64,6 +64,10 @@ a = Analysis(
 
 pyz = PYZ(a.pure)
 
+icon_file = None
+if sys.platform == "darwin":
+    icon_file = "build/macos/icon.icns"
+
 exe = EXE(
     pyz,
     a.scripts,
@@ -75,7 +79,7 @@ exe = EXE(
     strip=False,
     upx=True,
     console=False,
-    icon=None,
+    icon=icon_file,
 )
 
 coll = COLLECT(
@@ -87,13 +91,19 @@ coll = COLLECT(
     name="video-downloader",
 )
 
-app = BUNDLE(
-    coll,
-    name="ArbitraryDownloader.app",
-    icon=None,
-    bundle_identifier="com.ytdlp.downloader",
-    info_plist={
-        "NSHighResolutionCapable": True,
-        "CFBundleShortVersionString": "0.1.0",
-    },
-)
+if sys.platform == "darwin":
+    app = BUNDLE(
+        coll,
+        name="ArbitraryDownloader.app",
+        icon=icon_file,
+        bundle_identifier="com.ytdlp.downloader",
+        info_plist={
+            "CFBundleName": "ArbitraryDownloader",
+            "CFBundleDisplayName": "ArbitraryDownloader",
+            "CFBundleShortVersionString": "0.1.0",
+            "NSHighResolutionCapable": True,
+            "NSAppTransportSecurity": {
+                "NSAllowsArbitraryLoads": True,
+            },
+        },
+    )
