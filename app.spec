@@ -86,3 +86,14 @@ coll = COLLECT(
     upx=True,
     name="video-downloader",
 )
+
+app = BUNDLE(
+    coll,
+    name="ArbitraryDownloader.app",
+    icon=None,
+    bundle_identifier="com.ytdlp.downloader",
+    info_plist={
+        "NSHighResolutionCapable": True,
+        "CFBundleShortVersionString": "0.1.0",
+    },
+)

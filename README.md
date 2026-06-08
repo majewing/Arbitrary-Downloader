@@ -1,4 +1,4 @@
-# 通用视频下载器
+# ArbitraryDownloader
 
 基于 yt-dlp 的音视频下载器，提供 Web UI 和桌面 GUI 两种使用方式，支持 YouTube、Bilibili、抖音等平台。
 
@@ -76,14 +76,16 @@ uv add --dev pyinstaller
 # 打包
 uv run pyinstaller app.spec --noconfirm
 
-# 产物在 dist/video-downloader/ 目录
+# 产物在 dist/ArbitraryDownloader.app/
 ```
 
 ### macOS DMG
 
 ```bash
-bash build/macos/create-dmg.sh 0.1.0
-# 生成 dist/video-downloader-0.1.0-macos.dmg
+hdiutil create -volname "ArbitraryDownloader" \
+  -srcfolder dist/ArbitraryDownloader.app \
+  -ov -format UDZO \
+  ArbitraryDownloader.dmg
 ```
 
 ### CI 自动构建

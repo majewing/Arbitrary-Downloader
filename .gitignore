@@ -15,9 +15,11 @@ dmg_staging/
 
 # custom
 .DS_Store
+uv.lock
 .agents/
 .opencode/
 .superpowers/
 .playwright-mcp/
 docs/
+build/
 Downloads/
