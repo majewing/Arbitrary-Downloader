@@ -5,6 +5,8 @@ import urllib.parse
 
 import yt_dlp
 
+import ffmpeg_utils
+
 _DOUYIN_PATTERN = re.compile(r"(?:https?://)?(?:www\.)?douyin\.com/video/(\d+)")
 _MOBILE_UA = "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1"
 
@@ -25,6 +27,9 @@ class Downloader:
             "no_warnings": True,
             "remote_components": ["ejs:github"],
         }
+        ffmpeg_dir = ffmpeg_utils.ensure_ffmpeg()
+        if ffmpeg_dir:
+            opts["ffmpeg_location"] = ffmpeg_dir
         if browser:
             opts["cookiesfrombrowser"] = (browser,)
         return opts
