@@ -99,6 +99,16 @@ git push origin v0.1.0
 
 GitHub Actions 会自动构建三平台安装包并创建 Release。也可在 Actions 页面手动点击 "Run workflow" 触发。
 
+### macOS 安装后提示"已损坏"的解决方法
+
+由于应用未经过 Apple 公证，macOS Gatekeeper 会阻止打开并提示"已损坏"。安装后执行以下命令即可：
+
+```bash
+xattr -cr /Applications/ArbitraryDownloader.app
+```
+
+然后即可正常打开应用。
+
 ## GitHub 认证配置
 
 推送代码到 GitHub 需要配置认证，支持以下方式：

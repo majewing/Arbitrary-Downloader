@@ -30,7 +30,7 @@ def main():
 
     url = f"http://127.0.0.1:{port}"
     window = webview.create_window(
-        "通用视频下载器",
+        "ArbitraryDownloader",
         url,
         width=1200,
         height=800,

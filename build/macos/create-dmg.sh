@@ -2,7 +2,7 @@
 set -euo pipefail
 
 VERSION="${1:-0.1.0}"
-APP_NAME="通用视频下载器"
+APP_NAME="ArbitraryDownloader"
 EXEC_NAME="video-downloader"
 DIST_DIR="$(cd "$(dirname "$0")/../.." && pwd)/dist"
 DMG_DIR="$(cd "$(dirname "$0")/../.." && pwd)/dmg_staging"
@@ -23,9 +23,9 @@ cat > "${APP_BUNDLE}/Contents/Info.plist" << 'PLIST'
 <plist version="1.0">
 <dict>
     <key>CFBundleName</key>
-    <string>通用视频下载器</string>
+    <string>ArbitraryDownloader</string>
     <key>CFBundleDisplayName</key>
-    <string>通用视频下载器</string>
+    <string>ArbitraryDownloader</string>
     <key>CFBundleIdentifier</key>
     <string>com.video-downloader.app</string>
     <key>CFBundleVersion</key>

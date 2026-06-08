@@ -116,4 +116,24 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          body: |
+            ## 安装说明
+
+            ### macOS 用户
+            由于应用未经过 Apple 公证，打开时可能提示"已损坏"。请在终端执行以下命令后重新打开：
+
+            ```bash
+            xattr -cr /Applications/ArbitraryDownloader.app
+            ```
+
+            ### Windows 用户
+            下载 `.exe` 安装包，双击运行即可。
+
+            ### Linux 用户
+            下载 `.AppImage` 文件，添加执行权限后运行：
+
+            ```bash
+            chmod +x video-downloader-*-linux-x86_64.AppImage
+            ./video-downloader-*-linux-x86_64.AppImage
+            ```
           files: artifacts/**/*
